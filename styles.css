@@ -559,6 +559,29 @@ html, body {
   min-width: 2px;
 }
 
+/* Custom "Other" answer styling */
+.result-bar-other {
+  background: linear-gradient(90deg, #e8a87c, #d4789c);
+}
+.other-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #e8a87c, #d4789c);
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 700;
+  font-style: normal;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  margin-right: 0.35rem;
+  vertical-align: middle;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+.result-row-other {
+  border-left: 3px solid #d4789c;
+  padding-left: 0.5rem;
+}
+
 /* Ended State */
 .poll-ended-badge {
   display: inline-block;
