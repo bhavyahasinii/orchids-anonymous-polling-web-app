@@ -294,20 +294,29 @@ function buildHostPollHTML(poll) {
       </div>`;
   });
 
-  if (poll.allowOther) {
-    const otherCount = poll.otherVotes.length;
-    const pct = total > 0 ? Math.round((otherCount / total) * 100) : 0;
-    resultsHTML += `
-      <div class="result-row">
-        <div class="result-label">
-          <span class="result-label-text">Other</span>
-          <span class="result-count">${otherCount} vote${otherCount !== 1 ? 's' : ''} (${pct}%)</span>
-        </div>
-        <div class="result-bar-track">
-          <div class="result-bar-fill" style="width:${pct}%"></div>
-        </div>
-      </div>`;
-  }
+  // Show each custom "Other" answer as its own row in results
+    if (poll.allowOther && poll.otherVotes.length > 0) {
+      // Group other votes by their text
+      const otherCounts = {};
+      poll.otherVotes.forEach(txt => {
+        const key = txt.trim() || 'Other';
+        otherCounts[key] = (otherCounts[key] || 0) + 1;
+      });
+      Object.keys(otherCounts).forEach(answer => {
+        const count = otherCounts[answer];
+        const pct = total > 0 ? Math.round((count / total) * 100) : 0;
+        resultsHTML += `
+          <div class="result-row result-row-other">
+            <div class="result-label">
+              <span class="result-label-text"><em class="other-badge">Custom</em> ${escapeHtml(answer)}</span>
+              <span class="result-count">${count} vote${count !== 1 ? 's' : ''} (${pct}%)</span>
+            </div>
+            <div class="result-bar-track">
+              <div class="result-bar-fill result-bar-other" style="width:${pct}%"></div>
+            </div>
+          </div>`;
+      });
+    }
   resultsHTML += '</div>';
 
   const endedBadge = poll.ended ? '<span class="poll-ended-badge">Poll Ended</span>' : '';
