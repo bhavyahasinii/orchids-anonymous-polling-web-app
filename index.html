@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PollRoom - Anonymous Polling</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ========== LANDING PAGE ========== -->
+    <div id="page-landing" class="page active">
+      <div class="landing-container">
+        <div class="card landing-card fade-in">
+          <div class="app-logo">
+            <div class="logo-icon">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+                <rect x="4" y="8" width="40" height="32" rx="8" fill="#7c5cbf"/>
+                <rect x="10" y="20" width="8" height="14" rx="3" fill="#e8dff5"/>
+                <rect x="20" y="16" width="8" height="18" rx="3" fill="#d4c4eb"/>
+                <rect x="30" y="12" width="8" height="22" rx="3" fill="#c0a8e0"/>
+              </svg>
+            </div>
+            <h1 class="app-title">PollRoom</h1>
+            <p class="app-subtitle">Create anonymous polls in real-time rooms</p>
+          </div>
+          <div class="landing-actions">
+            <button class="btn btn-primary btn-lg" onclick="navigateTo('create-room')">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              Create Room
+            </button>
+            <button class="btn btn-secondary btn-lg" onclick="navigateTo('join-room')">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 10h11M10 6l4 4-4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Join Room
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== CREATE ROOM PAGE ========== -->
+    <div id="page-create-room" class="page">
+      <div class="landing-container">
+        <div class="card landing-card fade-in">
+          <button class="btn-back" onclick="navigateTo('landing')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M9 6l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
+          <h2 class="page-title">Your Room is Ready!</h2>
+          <p class="text-muted">Share this code with participants</p>
+          <div class="room-code-display">
+            <span id="room-code-text" class="room-code-digits"></span>
+            <button class="btn-icon" onclick="copyRoomCode()" title="Copy code">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="6" y="6" width="10" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 14V5a1 1 0 011-1h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <p id="copy-feedback" class="copy-feedback"></p>
+          <div class="share-text">
+            <p>Join my poll room! Code: <strong id="share-code"></strong></p>
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="hostEnterRoom()" style="margin-top:1rem;">
+            Enter Room
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== JOIN ROOM PAGE ========== -->
+    <div id="page-join-room" class="page">
+      <div class="landing-container">
+        <div class="card landing-card fade-in">
+          <button class="btn-back" onclick="navigateTo('landing')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M9 6l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Back
+          </button>
+          <h2 class="page-title">Join a Room</h2>
+          <p class="text-muted">Enter the 6-digit room code</p>
+          <div class="join-input-group">
+            <input type="text" id="join-code-input" class="input-code" placeholder="000000" maxlength="6" pattern="[0-9]*" inputmode="numeric" autocomplete="off">
+          </div>
+          <button class="btn btn-primary btn-lg" onclick="joinRoom()" style="margin-top:1rem;">
+            Join Room
+          </button>
+            <p id="join-error" class="error-text"></p>
+            <div class="test-hint">
+              <p><strong>Test code:</strong> Enter <code>123456</code> to try the participant view</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- ========== ROOM INTERFACE ========== -->
+    <div id="page-room" class="page">
+      <div class="room-layout">
+        <!-- Room Header -->
+        <div class="room-header">
+          <div class="room-header-left">
+            <button class="btn-back-sm" onclick="leaveRoom()">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M15 10H5M9 6l-4 4 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div>
+              <span class="room-header-code">Room: <strong id="header-room-code"></strong></span>
+              <span class="room-header-role" id="header-role"></span>
+            </div>
+          </div>
+          <div class="room-header-right">
+            <div class="participant-count">
+              <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/><path d="M4 17c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span id="participant-count">1</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat / Poll Area -->
+        <div class="room-chat" id="room-chat">
+          <div class="chat-welcome">
+            <p>Welcome to the room! <span id="welcome-role-msg"></span></p>
+          </div>
+        </div>
+
+        <!-- Host Input Area -->
+        <div class="room-input" id="host-input-area" style="display:none;">
+          <button class="btn btn-primary" onclick="openPollCreator()">
+            <svg width="18" height="18" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Create Poll
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== POLL CREATOR MODAL ========== -->
+    <div id="poll-modal" class="modal-overlay" style="display:none;">
+      <div class="modal-card fade-in">
+        <div class="modal-header">
+          <h3>Create a Poll</h3>
+          <button class="btn-close" onclick="closePollCreator()">&times;</button>
+        </div>
+        <div class="modal-body">
+          <label class="input-label">Question</label>
+          <input type="text" id="poll-question" class="input-field" placeholder="Ask something...">
+
+          <label class="input-label" style="margin-top:1rem;">Options</label>
+          <div id="poll-options-list">
+            <div class="option-row">
+              <input type="text" class="input-field poll-option-input" placeholder="Option 1">
+              <button class="btn-remove-option" onclick="removeOption(this)" title="Remove">&times;</button>
+            </div>
+            <div class="option-row">
+              <input type="text" class="input-field poll-option-input" placeholder="Option 2">
+              <button class="btn-remove-option" onclick="removeOption(this)" title="Remove">&times;</button>
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="addOption()">
+            <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            Add Option
+          </button>
+
+          <div class="toggle-row" style="margin-top:1rem;">
+            <label class="toggle-label">
+              <input type="checkbox" id="allow-other">
+              <span class="toggle-switch"></span>
+              Allow "Other" (custom answer)
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <label class="toggle-label">
+              <input type="checkbox" id="enable-timer">
+              <span class="toggle-switch"></span>
+              Add timer
+            </label>
+          </div>
+          <div id="timer-settings" style="display:none; margin-top:0.5rem;">
+            <label class="input-label">Duration (seconds)</label>
+            <input type="number" id="timer-duration" class="input-field" value="30" min="10" max="300" style="width:120px;">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" onclick="closePollCreator()">Cancel</button>
+          <button class="btn btn-primary" onclick="launchPoll()">Launch Poll</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
