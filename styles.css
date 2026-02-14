@@ -765,6 +765,26 @@ html, body {
   border-radius: 3px;
 }
 
+/* Test hint */
+.test-hint {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f5f0ff;
+  border: 1px dashed var(--primary-light);
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+.test-hint code {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  font-size: 0.9rem;
+}
+
 /* ===========================
    Responsive
    =========================== */
