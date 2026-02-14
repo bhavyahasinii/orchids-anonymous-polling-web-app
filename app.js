@@ -561,10 +561,28 @@ function submitVote(pollId) {
   const poll = state.polls.find(p => p.id === pollId);
   if (!poll || poll.submitted || poll.ended) return;
 
-  const selection = selectedOptions[pollId];
-  if (selection === undefined) return; // No selection
+    const selection = selectedOptions[pollId];
+    if (selection === undefined) return; // No selection
 
-  poll.submitted = true;
+    // If "Other" was selected, capture the typed text
+    if (selection === -1 && poll.allowOther) {
+      const otherInput = document.getElementById(`other-input-${pollId}`);
+      const otherText = otherInput ? otherInput.value.trim() : '';
+      if (!otherText) {
+        otherInput.style.borderColor = 'var(--danger)';
+        otherInput.placeholder = 'Please type your answer first...';
+        otherInput.focus();
+        setTimeout(() => { otherInput.style.borderColor = ''; }, 1500);
+        return;
+      }
+      poll.otherVotes.push(otherText);
+      poll.totalVotes++;
+    } else {
+      poll.votes[selection] = (poll.votes[selection] || 0) + 1;
+      poll.totalVotes++;
+    }
+
+    poll.submitted = true;
 
   // Update bubble
   const bubble = document.getElementById(`poll-${pollId}`);
